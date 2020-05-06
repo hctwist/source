@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="dragline_line_height">2dp</dimen>
+    <dimen name="dragline_text_size">24sp</dimen>
+    <dimen name="dragline_central_margin">24dp</dimen>
+    <dimen name="dragline_thumb_radius">8dp</dimen>
+    <dimen name="dragline_tick_height">16dp</dimen>
+    <dimen name="dragline_tick_width">2dp</dimen>
+    <dimen name="dragline_increment_width">64dp</dimen>
+</resources>

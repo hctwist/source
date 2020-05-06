@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="DraglineView">
+
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+        <attr name="android:fontFamily" />
+
+        <attr name="centralMargin" format="dimension" />
+
+        <attr name="tickHeight" format="dimension" />
+        <attr name="tickWidth" format="dimension" />
+        <attr name="tickColor" format="color" />
+
+        <attr name="thumbRadius" format="dimension" />
+        <attr name="thumbColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="SeekableTextView">
+
+        <attr name="incrementHeight" format="dimension" />
+
+        <attr name="seekThumbRadius" format="dimension" />
+        <attr name="seekThumbColor" format="color" />
+
+        <attr name="seekLineWidth" format="dimension" />
+        <attr name="seekLineColor" format="color" />
+
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+     </declare-styleable>
+</resources>
