@@ -2,21 +2,21 @@ package com.twisthenry8gmail.dragline
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
-import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
-    var minValue = Long.MIN_VALUE
+    var minValue: Long = Long.MIN_VALUE
         set(v) {
 
             field = v
@@ -43,7 +43,15 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
                 invalidate()
             }
         }
+
+    // TODO Introduce backing field and sort out minValue maxValue etc calling setters so many times
     var value = 0L
+        set(value) {
+
+            draggedValue = value
+            field = value
+            invalidate()
+        }
 
     var valueChangedListener: (Long) -> Unit = {}
     var textFactory: (Long) -> String = { it.toString() }
@@ -122,6 +130,22 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
 
         // Resolve attributes
         context.obtainStyledAttributes(attrs, R.styleable.DraglineView).run {
+
+            if (hasValue(R.styleable.DraglineView_minValue)) {
+                minValue = getInt(R.styleable.DraglineView_minValue, 0).toLong()
+            }
+
+            if (hasValue(R.styleable.DraglineView_maxValue)) {
+                maxValue = getInt(R.styleable.DraglineView_maxValue, 0).toLong()
+            }
+
+            if (hasValue(R.styleable.DraglineView_increment)) {
+                increment = getInt(R.styleable.DraglineView_increment, 0).toLong()
+            }
+
+            if (hasValue(R.styleable.DraglineView_value)) {
+                value = getInt(R.styleable.DraglineView_value, 0).toLong()
+            }
 
             setTextSize(
                 getDimension(
@@ -291,15 +315,5 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
         val fraction = (cx - tickX) / (cx - limitX)
 
         return tickHeight * (1 - fraction * fraction)
-    }
-
-    private fun restrictValue(v: Long) = v.coerceIn(minValue, maxValue)
-
-    private fun restrictDragDx(dx: Float): Float {
-
-        val minDx = (value - maxValue) * incrementWidth
-        val maxDx = (value - minValue) * incrementWidth
-
-        return dx.coerceIn(minDx, maxDx)
     }
 }

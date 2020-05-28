@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ProgressCircleView">
+
+        <attr name="progressCircleStyle" format="reference" />
+
+        <attr name="filledBackingArc" format="boolean" />
+        <attr name="strokeWidth" format="dimension" />
+    </declare-styleable>
+</resources>

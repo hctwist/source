@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import kotlinx.android.synthetic.main.seekable_text_view.view.*
