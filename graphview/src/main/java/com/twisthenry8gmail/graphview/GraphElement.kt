@@ -15,7 +15,7 @@ abstract class DataElement(val data: List<DataPoint>) : GraphElement() {
     class PlotPoint(val x: Float, val y: Float)
 }
 
-abstract class AxesElement(val isXAxes: Boolean): GraphElement() {
+abstract class AxisElement(val isXAxis: Boolean, val range: Range<Double>): GraphElement() {
 
     abstract fun measureOffset(canvas: Canvas): Float
 }

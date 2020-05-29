@@ -8,34 +8,10 @@ import android.view.View
 
 class GraphView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
 
-    private var xAxis: AxesElement? = null
-    private var yAxis: AxesElement? = null
+    private var xAxis: AxisElement? = null
+    private var yAxis: AxisElement? = null
     private val dataElements = mutableListOf<DataElement>()
     private val graphBounds = GraphBounds()
-
-    fun setMinX(x: Double) {
-
-        graphBounds.dataXRange = Range(x, graphBounds.dataXRange.upper)
-        invalidate()
-    }
-
-    fun setMaxX(x: Double) {
-
-        graphBounds.dataXRange = Range(graphBounds.dataXRange.lower, x)
-        invalidate()
-    }
-
-    fun setMinY(y: Double) {
-
-        graphBounds.dataYRange = Range(y, graphBounds.dataYRange.upper)
-        invalidate()
-    }
-
-    fun setMaxY(y: Double) {
-
-        graphBounds.dataYRange = Range(graphBounds.dataYRange.lower, y)
-        invalidate()
-    }
 
     fun setElements(graphElements: List<GraphElement>) {
 
@@ -43,10 +19,17 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
 
             when (it) {
 
-                is AxesElement -> {
+                is AxisElement -> {
 
-                    if (it.isXAxes) xAxis = it
-                    else yAxis = it
+                    if (it.isXAxis) {
+
+                        xAxis = it
+                        graphBounds.ensureXRangeIncludes(it.range)
+                    } else {
+
+                        yAxis = it
+                        graphBounds.ensureYRangeIncludes(it.range)
+                    }
                 }
 
                 is DataElement -> {
@@ -70,19 +53,20 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
             val xAxisOffset = xAxis?.measureOffset(c) ?: 0F
             val yAxisOffset = yAxis?.measureOffset(c) ?: 0F
 
+            graphBounds.dataRect.set(yAxisOffset, 0F, w, h - xAxisOffset)
+
             xAxis?.let { axis ->
 
-                graphBounds.drawArea.set(yAxisOffset, h - xAxisOffset, w, h)
+                graphBounds.xAxisRect.set(yAxisOffset, h - xAxisOffset, w, h)
                 axis.draw(c, graphBounds)
             }
 
             yAxis?.let { axis ->
 
-                graphBounds.drawArea.set(0F, 0F, yAxisOffset, h - xAxisOffset)
+                graphBounds.yAxisRect.set(0F, 0F, yAxisOffset, h - xAxisOffset)
                 axis.draw(c, graphBounds)
             }
 
-            graphBounds.drawArea.set(yAxisOffset, 0F, w, h - xAxisOffset)
             dataElements.forEach {
 
                 it.draw(c, graphBounds)

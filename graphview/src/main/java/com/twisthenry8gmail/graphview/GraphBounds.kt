@@ -5,34 +5,49 @@ import android.util.Range
 
 class GraphBounds {
 
-    var dataXRange = Range(0.0, 0.0)
-    var dataYRange = Range(0.0, 0.0)
+    var dataXRange: Range<Double>? = null
+    var dataYRange: Range<Double>? = null
 
-    // This can be changed in data element draw functions
-    val drawArea = RectF()
+    val xAxisRect = RectF()
+    val yAxisRect = RectF()
+    val dataRect = RectF()
+
+    fun requireDataXRange() = dataXRange!!
+
+    fun requireDataYRange() = dataYRange!!
 
     fun ensureRangesInclude(points: List<DataElement.DataPoint>) {
 
-        points.xRange()?.let { dataXRange = dataXRange.extend(it) }
-        points.yRange()?.let { dataYRange = dataYRange.extend(it) }
+        points.xRange()?.let { ensureXRangeIncludes(it) }
+        points.yRange()?.let { ensureYRangeIncludes(it) }
     }
 
-    fun mapToDrawArea(dataPoint: DataElement.DataPoint): DataElement.PlotPoint {
+    fun ensureXRangeIncludes(range: Range<Double>) {
 
-        val x = mapToDrawArea(dataPoint.x, dataXRange, drawArea.left, drawArea.right)
-        val y = mapToDrawArea(dataPoint.y, dataYRange, drawArea.top, drawArea.bottom)
+        dataXRange = dataXRange?.extend(range) ?: range
+    }
+
+    fun ensureYRangeIncludes(range: Range<Double>) {
+
+        dataYRange = dataYRange?.extend(range) ?: range
+    }
+
+    fun mapToDataRect(dataPoint: DataElement.DataPoint): DataElement.PlotPoint {
+
+        val x = mapToRect(dataPoint.x, requireDataXRange(), dataRect.left, dataRect.right)
+        val y = mapToRect(dataPoint.y, requireDataYRange(), dataRect.top, dataRect.bottom)
 
         return DataElement.PlotPoint(x, y)
     }
 
-    fun mapToDrawArea(
+    fun mapToRect(
         point: Double,
         range: Range<Double>,
-        drawStart: Float,
-        drawEnd: Float
+        rectStart: Float,
+        rectEnd: Float
     ): Float {
 
-        return (((point - range.lower) / range.size()) * (drawEnd - drawStart) + drawStart).toFloat()
+        return (((point - range.lower) / range.size()) * (rectEnd - rectStart) + rectStart).toFloat()
     }
 
     private fun Range<Double>.size() = upper - lower
