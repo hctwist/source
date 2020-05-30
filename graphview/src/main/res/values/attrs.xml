@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="GraphView">
+
+        <attr name="graphViewStyle" format="reference" />
+
+        <attr name="graphPlotColor" format="color" />
+        <attr name="graphPlotColorSecondary" format="color" />
+
+        <attr name="graphDefaultMargin" format="dimension" />
+
+        <attr name="graphPlotLineWidth" format="dimension" />
+
+        <attr name="graphAxisWidth" format="dimension" />
+        <attr name="graphAxisColor" format="color" />
+        <attr name="graphAxisTextColor" format="color" />
+        <attr name="graphAxisTextSize" format="dimension" />
+    </declare-styleable>
+</resources>

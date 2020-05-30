@@ -1,5 +1,7 @@
 package com.twisthenry8gmail.graphview
 
+import android.content.res.TypedArray
+import android.graphics.Color
 import android.graphics.RectF
 import android.util.Range
 
@@ -35,7 +37,12 @@ class GraphBounds {
     fun mapToDataRect(dataPoint: DataElement.DataPoint): DataElement.PlotPoint {
 
         val x = mapToRect(dataPoint.x, requireDataXRange(), dataRect.left, dataRect.right)
-        val y = mapToRect(dataPoint.y, requireDataYRange(), dataRect.top, dataRect.bottom)
+        val y = mapToRect(
+            dataPoint.y,
+            requireDataYRange(),
+            dataRect.bottom,
+            dataRect.top
+        )
 
         return DataElement.PlotPoint(x, y)
     }

@@ -3,7 +3,6 @@ package com.twisthenry8gmail.graphview
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
-import android.util.Range
 import android.view.View
 
 class GraphView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
@@ -11,7 +10,23 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
     private var xAxis: AxisElement? = null
     private var yAxis: AxisElement? = null
     private val dataElements = mutableListOf<DataElement>()
+
     private val graphBounds = GraphBounds()
+    private val graphStyle: GlobalGraphStyle
+
+    init {
+
+        val attributesArray = context.obtainStyledAttributes(
+            attributeSet,
+            R.styleable.GraphView,
+            R.attr.graphViewStyle,
+            0
+        )
+
+        graphStyle = GlobalGraphStyle(attributesArray)
+
+        attributesArray.recycle()
+    }
 
     fun setElements(graphElements: List<GraphElement>) {
 
@@ -38,6 +53,8 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
                     graphBounds.ensureRangesInclude(it.data)
                 }
             }
+
+            it.resolveStyle(context, graphStyle)
         }
 
         invalidate()
@@ -50,8 +67,8 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
             val w = width.toFloat()
             val h = height.toFloat()
 
-            val xAxisOffset = xAxis?.measureOffset(c) ?: 0F
-            val yAxisOffset = yAxis?.measureOffset(c) ?: 0F
+            val xAxisOffset = xAxis?.measureInset(c) ?: 0F
+            val yAxisOffset = yAxis?.measureInset(c) ?: 0F
 
             graphBounds.dataRect.set(yAxisOffset, 0F, w, h - xAxisOffset)
 
