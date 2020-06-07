@@ -1,7 +1,5 @@
 package com.twisthenry8gmail.graphview
 
-import android.content.res.TypedArray
-import android.graphics.Color
 import android.graphics.RectF
 import android.util.Range
 
@@ -10,18 +8,39 @@ class GraphBounds {
     var dataXRange: Range<Double>? = null
     var dataYRange: Range<Double>? = null
 
-    val xAxisRect = RectF()
-    val yAxisRect = RectF()
-    val dataRect = RectF()
+    var width = 0F
+    var height = 0F
+    val plotRect = RectF()
+
+    fun resetPlotRect() {
+
+        plotRect.set(0F, 0F, width, height)
+    }
 
     fun requireDataXRange() = dataXRange!!
 
     fun requireDataYRange() = dataYRange!!
 
-    fun ensureRangesInclude(points: List<DataElement.DataPoint>) {
+    fun ensureRangesInclude(point: DataPoint) {
+
+        ensureXRangeIncludes(point.x)
+        ensureYRangeIncludes(point.y)
+    }
+
+    fun ensureRangesInclude(points: List<DataPoint>) {
 
         points.xRange()?.let { ensureXRangeIncludes(it) }
         points.yRange()?.let { ensureYRangeIncludes(it) }
+    }
+
+    private fun ensureXRangeIncludes(point: Double) {
+
+        dataXRange = dataXRange?.extend(point) ?: Range(point, point)
+    }
+
+    private fun ensureYRangeIncludes(point: Double) {
+
+        dataYRange = dataYRange?.extend(point) ?: Range(point, point)
     }
 
     fun ensureXRangeIncludes(range: Range<Double>) {
@@ -34,17 +53,17 @@ class GraphBounds {
         dataYRange = dataYRange?.extend(range) ?: range
     }
 
-    fun mapToDataRect(dataPoint: DataElement.DataPoint): DataElement.PlotPoint {
+    fun mapToPlotRect(seriesPoint: DataPoint): PlotPoint {
 
-        val x = mapToRect(dataPoint.x, requireDataXRange(), dataRect.left, dataRect.right)
+        val x = mapToRect(seriesPoint.x, requireDataXRange(), plotRect.left, plotRect.right)
         val y = mapToRect(
-            dataPoint.y,
+            seriesPoint.y,
             requireDataYRange(),
-            dataRect.bottom,
-            dataRect.top
+            plotRect.bottom,
+            plotRect.top
         )
 
-        return DataElement.PlotPoint(x, y)
+        return PlotPoint(x, y)
     }
 
     fun mapToRect(

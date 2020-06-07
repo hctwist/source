@@ -14,25 +14,25 @@ abstract class LabelAxis(
     val style: Style? = null
 ) : AxisElement(isXAxis, range) {
 
-    protected val textPaint = Paint().apply {
+    protected val axisPaint = Paint()
+
+    protected val labelPaint = Paint().apply {
 
         isAntiAlias = true
     }
-
-    protected val axisPaint = Paint()
 
     protected var margin = 0F
 
     override fun resolveStyle(context: Context, globalStyle: GlobalGraphStyle) {
 
-        textPaint.color =
-            style?.textColorRes?.let { context.getColor(it) } ?: globalStyle.axisTextColor
-        textPaint.textSize = globalStyle.axisTextSize
+        axisPaint.color = globalStyle.axisColor
+        axisPaint.strokeWidth = globalStyle.axisWidth
+
+        labelPaint.color =
+            style?.textColorRes?.let { context.getColor(it) } ?: globalStyle.textColor
+        labelPaint.textSize = globalStyle.textSize
 
         margin = globalStyle.defaultMargin
-
-        axisPaint.strokeWidth = globalStyle.axisWidth
-        axisPaint.color = globalStyle.axisColor
     }
 
     class Style {
@@ -46,68 +46,111 @@ abstract class LabelAxis(
 
         init {
 
-            textPaint.textAlign = Paint.Align.CENTER
+            labelPaint.textAlign = Paint.Align.CENTER
         }
 
-        override fun measureInset(canvas: Canvas): Float {
+        override fun resolveBounds(
+            graphBounds: GraphBounds
+        ) {
 
-            // TODO Use real text bounds somehow
-            return -textPaint.ascent() + margin
+            graphBounds.apply {
+
+                plotRect.bottom -= labelPaint.descent() - labelPaint.ascent() + margin
+
+                // TODO Only do this if text is going outside the view - might be fixed when 'max' overhaul happens, see GraphElement comment
+                plotRect.left += labelPaint.measureText(labels.first().label) / 2
+                plotRect.right -= labelPaint.measureText(labels.last().label) / 2
+            }
         }
 
         override fun draw(canvas: Canvas, graphBounds: GraphBounds) {
 
-            val leftInset = textPaint.measureText(labels.first().label) / 2
-            val rightInset = textPaint.measureText(labels.last().label) / 2
+            val plotRect = graphBounds.plotRect
 
-            graphBounds.xAxisRect.left += leftInset
-            graphBounds.xAxisRect.right -= rightInset
-            graphBounds.dataRect.left += leftInset
-            graphBounds.dataRect.right -= rightInset
+            canvas.drawLine(
+                plotRect.left,
+                plotRect.bottom,
+                plotRect.right,
+                plotRect.bottom,
+                axisPaint
+            )
 
             labels.forEach {
 
                 val x = graphBounds.mapToRect(
                     it.point,
                     graphBounds.requireDataXRange(),
-                    graphBounds.xAxisRect.left,
-                    graphBounds.xAxisRect.right
+                    plotRect.left,
+                    plotRect.right
                 )
 
-                canvas.drawText(it.label, x, graphBounds.xAxisRect.bottom, textPaint)
+                canvas.drawText(
+                    it.label,
+                    x,
+                    graphBounds.height - labelPaint.descent(),
+                    labelPaint
+                )
             }
         }
     }
 
-    class Y(range: Range<Double>, labels: List<Label>, style: Style? = null) :
+    class Y(
+        range: Range<Double>,
+        labels: List<Label>,
+        style: Style? = null
+    ) :
         LabelAxis(false, range, labels, style) {
 
         private val textBoundsAlloc = Rect()
 
-        override fun measureInset(canvas: Canvas): Float {
+        init {
 
-            return (labels.map { textPaint.measureText(it.label) }.max() ?: 0F) + margin
+            labelPaint.textAlign = Paint.Align.RIGHT
+        }
+
+        override fun resolveBounds(graphBounds: GraphBounds) {
+
+            if (labels.isNotEmpty()) {
+                graphBounds.apply {
+
+                    // TODO This is happening for X as well, need max system
+                    plotRect.left += (labels.map { labelPaint.measureText(it.label) }.max()
+                        ?: 0F) + margin
+
+                    val topLabel = labels.last().label
+                    labelPaint.getTextBounds(topLabel, 0, topLabel.length, textBoundsAlloc)
+                    plotRect.top += textBoundsAlloc.height().toFloat() / 2
+                }
+            }
         }
 
         override fun draw(canvas: Canvas, graphBounds: GraphBounds) {
 
-            val topLabel = labels.last().label
-            textPaint.getTextBounds(topLabel, 0, topLabel.length, textBoundsAlloc)
-            val topInset = textBoundsAlloc.height() / 2
+            val plotRect = graphBounds.plotRect
 
-            graphBounds.yAxisRect.top += topInset
-            graphBounds.dataRect.top += topInset
+            canvas.drawLine(
+                plotRect.left,
+                plotRect.bottom,
+                plotRect.left,
+                plotRect.top,
+                axisPaint
+            )
 
             labels.forEach {
 
                 val y = graphBounds.mapToRect(
                     it.point,
                     graphBounds.requireDataYRange(),
-                    graphBounds.yAxisRect.bottom,
-                    graphBounds.yAxisRect.top
+                    plotRect.bottom,
+                    plotRect.top
                 )
 
-                canvas.drawText(it.label, graphBounds.yAxisRect.left, y + topInset, textPaint)
+                canvas.drawText(
+                    it.label,
+                    plotRect.left - margin,
+                    y + textBoundsAlloc.height().toFloat() / 2,
+                    labelPaint
+                )
             }
         }
     }

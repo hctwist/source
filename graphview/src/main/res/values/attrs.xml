@@ -8,13 +8,16 @@
         <attr name="graphPlotColor" format="color" />
         <attr name="graphPlotColorSecondary" format="color" />
 
+        <attr name="graphTextColor" format="color" />
+        <attr name="graphTextSize" format="dimension" />
+
         <attr name="graphDefaultMargin" format="dimension" />
 
         <attr name="graphPlotLineWidth" format="dimension" />
 
+        <attr name="graphPlotPointRadius" format="dimension" />
+
         <attr name="graphAxisWidth" format="dimension" />
         <attr name="graphAxisColor" format="color" />
-        <attr name="graphAxisTextColor" format="color" />
-        <attr name="graphAxisTextSize" format="dimension" />
     </declare-styleable>
 </resources>

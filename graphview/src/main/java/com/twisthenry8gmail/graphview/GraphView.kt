@@ -2,14 +2,14 @@ package com.twisthenry8gmail.graphview
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 
 class GraphView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
 
-    private var xAxis: AxisElement? = null
-    private var yAxis: AxisElement? = null
-    private val dataElements = mutableListOf<DataElement>()
+    private var graphElements = listOf<GraphElement>()
 
     private val graphBounds = GraphBounds()
     private val graphStyle: GlobalGraphStyle
@@ -28,8 +28,9 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
         attributesArray.recycle()
     }
 
-    fun setElements(graphElements: List<GraphElement>) {
+    fun setElements(elements: List<GraphElement>) {
 
+        graphElements = elements
         graphElements.forEach {
 
             when (it) {
@@ -38,56 +39,66 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
 
                     if (it.isXAxis) {
 
-                        xAxis = it
                         graphBounds.ensureXRangeIncludes(it.range)
                     } else {
 
-                        yAxis = it
                         graphBounds.ensureYRangeIncludes(it.range)
                     }
                 }
 
-                is DataElement -> {
+                is SeriesElement -> {
 
-                    dataElements.add(it)
                     graphBounds.ensureRangesInclude(it.data)
+                }
+
+                is PointElement -> {
+
+                    graphBounds.ensureRangesInclude(it.point)
                 }
             }
 
             it.resolveStyle(context, graphStyle)
         }
 
+        invalidateElements()
         invalidate()
+    }
+
+    fun invalidateElements() {
+
+        graphBounds.resetPlotRect()
+        graphElements.forEach {
+
+            it.resolveBounds(graphBounds)
+        }
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+
+        graphBounds.width = w.toFloat()
+        graphBounds.height = h.toFloat()
+        invalidateElements()
     }
 
     override fun onDraw(canvas: Canvas?) {
 
         canvas?.let { c ->
 
-            val w = width.toFloat()
-            val h = height.toFloat()
-
-            val xAxisOffset = xAxis?.measureInset(c) ?: 0F
-            val yAxisOffset = yAxis?.measureInset(c) ?: 0F
-
-            graphBounds.dataRect.set(yAxisOffset, 0F, w, h - xAxisOffset)
-
-            xAxis?.let { axis ->
-
-                graphBounds.xAxisRect.set(yAxisOffset, h - xAxisOffset, w, h)
-                axis.draw(c, graphBounds)
-            }
-
-            yAxis?.let { axis ->
-
-                graphBounds.yAxisRect.set(0F, 0F, yAxisOffset, h - xAxisOffset)
-                axis.draw(c, graphBounds)
-            }
-
-            dataElements.forEach {
+            graphElements.forEach {
 
                 it.draw(c, graphBounds)
             }
+        }
+    }
+
+    companion object {
+
+        // RELEASE Remove
+        val TEST_PAINT = Paint().apply {
+
+            style = Paint.Style.STROKE
+            color = Color.RED
+            strokeWidth = 2F
         }
     }
 }

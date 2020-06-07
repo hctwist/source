@@ -1,3 +1,4 @@
+include ':playground'
 rootProject.name='Project Source'
 include ':app'
 include ':dragline'

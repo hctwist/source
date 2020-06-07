@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SeekableTextView">
+
+        <attr name="incrementHeight" format="dimension" />
+
+        <attr name="seekThumbRadius" format="dimension" />
+        <attr name="seekThumbColor" format="color" />
+
+        <attr name="seekLineWidth" format="dimension" />
+        <attr name="seekLineColor" format="color" />
+
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+    </declare-styleable>
+</resources>

@@ -1,4 +1,4 @@
-package com.twisthenry8gmail.dragline
+package com.twisthenry8gmail.playground
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -77,7 +77,9 @@ class SeekableTextView(context: Context, attrs: AttributeSet) :
 
         dragAllowanceMultiple = 2F
 
-        context.obtainStyledAttributes(attrs, R.styleable.SeekableTextView).run {
+        context.obtainStyledAttributes(attrs,
+            R.styleable.SeekableTextView
+        ).run {
 
             incrementHeight = getDimension(R.styleable.SeekableTextView_incrementHeight, 100F)
 

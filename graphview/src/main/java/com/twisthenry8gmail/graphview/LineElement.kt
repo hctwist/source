@@ -2,10 +2,9 @@ package com.twisthenry8gmail.graphview
 
 import android.content.Context
 import android.graphics.*
-import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 
-class LineElement(data: List<DataPoint>, private val style: Style? = null) : DataElement(data) {
+class LineElement(data: List<DataPoint>, private val style: Style? = null) : SeriesElement(data) {
 
     private val linePaint = Paint().apply {
 
@@ -17,6 +16,7 @@ class LineElement(data: List<DataPoint>, private val style: Style? = null) : Dat
     private val lineFillPaint = Paint().apply {
 
         isAntiAlias = true
+        style = Paint.Style.FILL_AND_STROKE
     }
 
     private val fill = style?.fillLine ?: false
@@ -27,7 +27,7 @@ class LineElement(data: List<DataPoint>, private val style: Style? = null) : Dat
 
         linePaint.strokeWidth = style?.lineWidthRes?.let { context.resources.getDimension(it) }
             ?: globalStyle.plotLineWidth
-        linePaint.color = style?.lineColorRes?.let { context.getColor(it) } ?: globalStyle.plotColor
+        linePaint.color = style?.lineColor?.resolve(context) ?: globalStyle.plotColor
         style?.dashWidthRes?.let {
 
             val dashWidth = context.resources.getDimension(it.first)
@@ -36,16 +36,28 @@ class LineElement(data: List<DataPoint>, private val style: Style? = null) : Dat
         }
 
         lineFillPaint.color =
-            style?.lineFillColorRes?.let { context.getColor(it) } ?: globalStyle.plotColorSecondary
+            style?.lineFillColor?.resolve(context) ?: globalStyle.plotColorSecondary
+        lineFillPaint.strokeWidth = linePaint.strokeWidth
+    }
+
+    override fun resolveBounds(graphBounds: GraphBounds) {
+
+        graphBounds.plotRect.apply {
+
+            val strokeWidth = linePaint.strokeWidth / 2
+            left += strokeWidth
+            right -= strokeWidth
+            bottom -= strokeWidth
+        }
     }
 
     override fun draw(canvas: Canvas, graphBounds: GraphBounds) {
 
         if (data.size > 1) {
 
-            val dataRect = graphBounds.dataRect
+            val plotRect = graphBounds.plotRect
 
-            val firstPoint = graphBounds.mapToDataRect(data.first())
+            val firstPoint = graphBounds.mapToPlotRect(data.first())
 
             linePath.reset()
             linePath.moveTo(firstPoint.x, firstPoint.y)
@@ -53,13 +65,13 @@ class LineElement(data: List<DataPoint>, private val style: Style? = null) : Dat
             if (fill) {
 
                 fillPath.reset()
-                fillPath.moveTo(dataRect.left, dataRect.bottom)
+                fillPath.moveTo(plotRect.left, plotRect.bottom)
                 fillPath.lineTo(firstPoint.x, firstPoint.y)
             }
 
             for (i in 1 until data.size) {
 
-                val point = graphBounds.mapToDataRect(data[i])
+                val point = graphBounds.mapToPlotRect(data[i])
 
                 linePath.lineTo(point.x, point.y)
                 if (fill) fillPath.lineTo(point.x, point.y)
@@ -67,7 +79,7 @@ class LineElement(data: List<DataPoint>, private val style: Style? = null) : Dat
 
             if (fill) {
 
-                fillPath.lineTo(graphBounds.mapToDataRect(data.last()).x, dataRect.bottom)
+                fillPath.lineTo(graphBounds.mapToPlotRect(data.last()).x, plotRect.bottom)
                 fillPath.close()
                 canvas.drawPath(fillPath, lineFillPaint)
             }
@@ -81,14 +93,12 @@ class LineElement(data: List<DataPoint>, private val style: Style? = null) : Dat
         @DimenRes
         var lineWidthRes: Int? = null
 
-        @ColorRes
-        var lineColorRes: Int? = null
+        var lineColor = ColorResolver()
 
         var dashWidthRes: Pair<Int, Int>? = null
 
         var fillLine: Boolean? = null
 
-        @ColorRes
-        var lineFillColorRes: Int? = null
+        var lineFillColor = ColorResolver()
     }
 }

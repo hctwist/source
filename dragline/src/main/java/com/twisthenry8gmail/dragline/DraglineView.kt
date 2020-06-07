@@ -44,7 +44,6 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
             }
         }
 
-    // TODO Introduce backing field and sort out minValue maxValue etc calling setters so many times
     var value = 0L
         set(value) {
 
@@ -60,7 +59,7 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
     private var thumbRadius = resources.getDimension(R.dimen.dragline_thumb_radius)
     private var tickHeight = resources.getDimension(R.dimen.dragline_tick_height)
     private var incrementWidth = resources.getDimension(R.dimen.dragline_increment_width)
-    private var nTicks = 5 // TODO attr
+    private var nTicks = 5
 
     private var thumbBounceAnimationDuration = 200L
     private var tickSettleAnimationDuration = 100L
@@ -170,69 +169,12 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
                 resources.getDimension(R.dimen.dragline_tick_width)
             )
             tickPaint.color = getColor(R.styleable.DraglineView_tickColor, Color.RED)
+            nTicks = getInteger(R.styleable.DraglineView_numberOfTicks, nTicks)
 
             thumbRadius = getDimension(R.styleable.DraglineView_thumbRadius, thumbRadius)
             thumbPaint.color = getColor(R.styleable.DraglineView_thumbColor, Color.RED)
 
             recycle()
-        }
-
-        setOnTouchListener { _, event ->
-
-            when (event.action) {
-
-                MotionEvent.ACTION_DOWN -> {
-
-                    if (!bouncingBack) {
-
-                        dragging = true
-                        dragStartX = event.x
-                        true
-                    } else {
-
-                        false
-                    }
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-
-                    val dx = event.x - dragStartX
-
-                    draggedValue = (value + (dx / incrementWidth).roundToLong() * increment)
-                        .coerceIn(minValue, maxValue)
-
-                    thumbOffset = dx
-                    //TODO Restrict tick offset with min and max values
-                    tickOffset = -dx % incrementWidth
-
-                    if (tickOffset > incrementWidth / 2) tickOffset -= incrementWidth
-                    if (tickOffset < -incrementWidth / 2) tickOffset += incrementWidth
-
-                    invalidate()
-                    true
-                }
-
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-
-                    dragging = false
-                    bouncingBack = true
-
-                    releasedThumbOffset = thumbOffset
-                    thumbBounceAnimator.start()
-
-                    releasedTickOffset = tickOffset
-                    tickSettleAnimator.start()
-
-                    if (value != draggedValue) {
-                        value = draggedValue
-                        valueChangedListener(value)
-                    }
-
-                    true
-                }
-
-                else -> false
-            }
         }
     }
 
@@ -244,6 +186,89 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
     fun setTextColor(color: Int) {
 
         textPaint.color = color
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+
+        return when (event?.action) {
+
+            MotionEvent.ACTION_DOWN -> {
+
+                if (!bouncingBack) {
+
+                    dragging = true
+                    dragStartX = event.x
+                    true
+                } else {
+
+                    super.onTouchEvent(event)
+                }
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+
+                val dx = event.x - dragStartX
+
+                thumbOffset = dx
+
+                draggedValue = (value + (dx / incrementWidth).roundToLong() * increment).coerceIn(
+                    minValue,
+                    maxValue
+                )
+
+                val tickOffsetDeterminator = value + (dx / incrementWidth) * increment
+                if (tickOffsetDeterminator in minValue.toFloat()..maxValue.toFloat()) {
+
+                    tickOffset = -dx % incrementWidth
+
+                    if (tickOffset > incrementWidth / 2) tickOffset -= incrementWidth
+                    if (tickOffset < -incrementWidth / 2) tickOffset += incrementWidth
+                } else {
+
+                    tickOffset = 0F
+                }
+
+                invalidate()
+                true
+            }
+
+            MotionEvent.ACTION_UP -> {
+
+                performClick()
+                true
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+
+                releaseThumb()
+                true
+            }
+
+            else -> super.onTouchEvent(event)
+        }
+    }
+
+    override fun performClick(): Boolean {
+
+        releaseThumb()
+        return super.performClick()
+    }
+
+    fun releaseThumb() {
+
+        dragging = false
+        bouncingBack = true
+
+        releasedThumbOffset = thumbOffset
+        thumbBounceAnimator.start()
+
+        releasedTickOffset = tickOffset
+        tickSettleAnimator.start()
+
+        if (value != draggedValue) {
+            value = draggedValue
+            valueChangedListener(value)
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
