@@ -55,7 +55,7 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
         }
     }
 
-    fun setBackingArcColor(color: Int) {
+    fun setBackingColor(color: Int) {
 
         backingPaint.color = color
         invalidate()
