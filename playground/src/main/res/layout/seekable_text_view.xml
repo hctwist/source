@@ -15,11 +15,12 @@
         android:textSize="96sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.twisthenry8gmail.dragline.InfiniteVerticalSeekbar
+    <com.twisthenry8gmail.playground.InfiniteVerticalSeekbar
         android:id="@+id/seekable_text_view_seekbar"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.twisthenry8gmail.dragline
+package com.twisthenry8gmail.playground
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
+import com.twisthenry8gmail.playground.R
 import kotlinx.android.synthetic.main.seekable_text_view.view.*
 import kotlin.math.*
 

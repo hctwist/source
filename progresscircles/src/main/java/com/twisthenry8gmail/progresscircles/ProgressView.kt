@@ -9,6 +9,7 @@ import android.view.View
 import android.view.animation.Interpolator
 import android.view.animation.PathInterpolator
 import androidx.core.animation.doOnEnd
+import kotlin.math.abs
 import kotlin.math.roundToLong
 
 abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
@@ -102,7 +103,7 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
 
             interpolator = chooseInterpolator()
             duration =
-                (totalDuration * ((progress - animationProgress) / target)).roundToLong()
+                (totalDuration * ((abs(progress - animationProgress)) / target)).roundToLong()
             addUpdateListener {
 
                 animationProgress = (it.animatedValue as Float).toDouble()
