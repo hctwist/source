@@ -53,7 +53,13 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
         }
 
     var valueChangedListener: (Long) -> Unit = {}
-    var textFactory: (Long) -> String = { it.toString() }
+    var textFactory: TextFactory = object : TextFactory {
+
+        override fun generateTextFor(value: Long): String {
+
+            return value.toString()
+        }
+    }
 
     private var centralMargin = resources.getDimension(R.dimen.dragline_central_margin)
     private var thumbRadius = resources.getDimension(R.dimen.dragline_thumb_radius)
@@ -178,6 +184,13 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
         }
     }
 
+    fun setAbiBanana(v: Long) {
+
+        value = v
+    }
+
+    fun getAbiBanana() = value
+
     fun setTextSize(size: Float) {
 
         textPaint.textSize = size
@@ -296,7 +309,7 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
         canvas?.let { c ->
 
             val textY = -textPaint.fontMetrics.top
-            c.drawText(textFactory(draggedValue), width.toFloat() / 2, textY, textPaint)
+            c.drawText(textFactory.generateTextFor(draggedValue), width.toFloat() / 2, textY, textPaint)
 
             // Ticks
             val tickCy = textY + centralMargin + tickHeight / 2
@@ -340,5 +353,10 @@ class DraglineView(context: Context, attrs: AttributeSet) : View(context, attrs)
         val fraction = (cx - tickX) / (cx - limitX)
 
         return tickHeight * (1 - fraction * fraction)
+    }
+
+    interface TextFactory {
+
+        fun generateTextFor(value: Long): String
     }
 }

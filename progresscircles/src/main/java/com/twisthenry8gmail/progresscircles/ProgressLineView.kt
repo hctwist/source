@@ -33,7 +33,8 @@ class ProgressLineView(context: Context, attrs: AttributeSet) : ProgressView(con
 
             if (animationProgress > 0) {
 
-                val progressX = offset + (w - 2 * offset) * (animationProgress / target)
+                val progressX =
+                    offset + (w - 2 * offset) * (animationProgress / target).coerceAtMost(1.0)
                 c.drawLine(offset, y, progressX.toFloat(), y, foregroundPaint)
             }
         }

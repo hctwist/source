@@ -4,10 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.twisthenry8gmail.playground.SeekableTextView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:textSize="200dp"
-        android:layout_marginHorizontal="50dp"
+        android:id="@+id/test"
         android:layout_height="match_parent" />
 
 </LinearLayout>

@@ -13,7 +13,7 @@ import kotlin.math.roundToLong
 
 class ProgressCircleView(context: Context, attrs: AttributeSet?) : ProgressView(context, attrs) {
 
-    private var gradientColors: IntArray? = null
+    var gradientColors: IntArray? = null
         set(value) {
 
             field = value
@@ -110,7 +110,11 @@ class ProgressCircleView(context: Context, attrs: AttributeSet?) : ProgressView(
         canvas?.let { c ->
 
             c.drawArc(arcRect, -90F, 360F, false, backingPaint)
-            c.drawArc(arcRect, -90F, getSweepAngle(animationProgress), false, foregroundPaint)
+
+            if (target > 0) {
+
+                c.drawArc(arcRect, -90F, getSweepAngle(animationProgress), false, foregroundPaint)
+            }
         }
     }
 

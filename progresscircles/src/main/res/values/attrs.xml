@@ -5,6 +5,8 @@
 
         <attr name="progressCircleStyle" format="reference" />
 
-        <attr name="strokeWidth" format="dimension" />
+        <attr name="progressStrokeWidth" format="dimension" />
+        <attr name="progressBackingColor" format="color" />
+        <attr name="progressColor" format="color" />
     </declare-styleable>
 </resources>

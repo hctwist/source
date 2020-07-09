@@ -2,6 +2,7 @@ package com.twisthenry8gmail.progresscircles
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.util.AttributeSet
@@ -29,8 +30,13 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
     }
 
     var target = 10L
+        set(value) {
 
-    private var progress = 0L
+            field = value
+            invalidate()
+        }
+
+    private var progress: Long? = null
 
     protected var animationProgress = 0.0
 
@@ -47,10 +53,13 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
 
             setStrokeWidth(
                 getDimension(
-                    R.styleable.ProgressView_strokeWidth,
+                    R.styleable.ProgressView_progressStrokeWidth,
                     resources.getDimension(R.dimen.progress_circle_stroke_width)
                 )
             )
+
+            setBackingColor(getColor(R.styleable.ProgressView_progressBackingColor, Color.WHITE))
+            setColor(getColor(R.styleable.ProgressView_progressColor, Color.BLACK))
 
             recycle()
         }
@@ -75,10 +84,17 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
         invalidate()
     }
 
+    fun setProgress(progress: Long?) {
+
+        if (progress != null) setProgress(progress, true)
+    }
+
     fun setProgress(progress: Long, animate: Boolean = false, animationCallback: () -> Unit = {}) {
 
+        val shouldAnimate = animate && this.progress != null
+
         this.progress = progress
-        if (animate) {
+        if (shouldAnimate) {
             animateProgress(animationCallback)
         } else {
             updateProgress()
@@ -86,10 +102,12 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
         }
     }
 
+    private fun resolveProgress(): Long = progress ?: 0L
+
     private fun updateProgress() {
 
         animator?.cancel()
-        animationProgress = progress.toDouble()
+        animationProgress = resolveProgress().toDouble()
         invalidate()
     }
 
@@ -99,29 +117,30 @@ abstract class ProgressView(context: Context, attrs: AttributeSet?) : View(conte
 
         val totalDuration = 2000
 
-        animator = ValueAnimator.ofFloat(animationProgress.toFloat(), progress.toFloat()).apply {
+        animator =
+            ValueAnimator.ofFloat(animationProgress.toFloat(), resolveProgress().toFloat()).apply {
 
-            interpolator = chooseInterpolator()
-            duration =
-                (totalDuration * ((abs(progress - animationProgress)) / target)).roundToLong()
-            addUpdateListener {
+                interpolator = chooseInterpolator()
+                duration =
+                    (totalDuration * ((abs(resolveProgress() - animationProgress)) / target)).roundToLong()
+                addUpdateListener {
 
-                animationProgress = (it.animatedValue as Float).toDouble()
-                invalidate()
+                    animationProgress = (it.animatedValue as Float).toDouble()
+                    invalidate()
+                }
+
+                doOnEnd {
+
+                    callback()
+                }
+
+                start()
             }
-
-            doOnEnd {
-
-                callback()
-            }
-
-            start()
-        }
     }
 
     private fun chooseInterpolator(): Interpolator {
 
-        return if (progress >= target) {
+        return if (resolveProgress() >= target) {
             PathInterpolator(0.6F, 0F, 0.4F, 1F)
         } else {
             PathInterpolator(0.8F, 0F, 0.2F, 1.4F)
