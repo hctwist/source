@@ -7,19 +7,25 @@
         <option name="testRunner" value="PLATFORM" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="1.8" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/android-basics" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/buttons" />
             <option value="$PROJECT_DIR$/dragline" />
             <option value="$PROJECT_DIR$/graphview" />
+            <option value="$PROJECT_DIR$/kotlin-basics" />
             <option value="$PROJECT_DIR$/playground" />
             <option value="$PROJECT_DIR$/progresscircles" />
             <option value="$PROJECT_DIR$/recyclerextensions" />
+            <option value="$PROJECT_DIR$/selectslider" />
+            <option value="$PROJECT_DIR$/skeletonlayout" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
+        <option name="useQualifiedModuleNames" value="true" />
       </GradleProjectSettings>
     </option>
   </component>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SkeletonLayout">
+
+        <attr name="skeleton" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SkeletonLayout_Layout">
+
+        <attr name="layout_skeletonMode" format="enum">
+
+            <enum name="skeleton" value="0" />
+            <enum name="invisible" value="1" />
+            <enum name="content" value="2" />
+        </attr>
+        <attr name="layout_skeletonTextLength" format="integer" />
+    </declare-styleable>
+</resources>

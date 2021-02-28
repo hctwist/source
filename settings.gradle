@@ -1,6 +1,11 @@
-include ':playground'
+include ':selectslider'
+include ':kotlin-basics'
+include ':android-basics'
 rootProject.name='Project Source'
+
 include ':app'
+include ':skeletonlayout'
+include ':playground'
 include ':dragline'
 include ':buttons'
 include ':recyclerextensions'

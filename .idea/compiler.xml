@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.7">
+      <module name="Project_Source.android-basics" target="1.8" />
+      <module name="Project_Source.app" target="1.8" />
+      <module name="Project_Source.buttons" target="1.8" />
+      <module name="Project_Source.dragline" target="1.8" />
+      <module name="Project_Source.graphview" target="1.8" />
+      <module name="Project_Source.playground" target="1.8" />
+      <module name="Project_Source.progresscircles" target="1.8" />
+      <module name="Project_Source.recyclerextensions" target="1.8" />
+      <module name="Project_Source.selectslider" target="1.8" />
+      <module name="Project_Source.skeletonlayout" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
