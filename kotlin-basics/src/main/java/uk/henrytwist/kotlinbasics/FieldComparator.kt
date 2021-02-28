@@ -1,4 +1,4 @@
-package uk.henrytwist.androidbasics
+package uk.henrytwist.kotlinbasics
 
 inline fun <T> fieldComparator(builder: FieldComparator<T>.() -> Unit): FieldComparator<T> {
 

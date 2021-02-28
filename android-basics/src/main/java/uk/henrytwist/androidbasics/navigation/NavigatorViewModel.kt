@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
-import uk.henrytwist.androidbasics.Event
+import uk.henrytwist.kotlinbasics.Event
 import uk.henrytwist.androidbasics.livedata.observeEvent
 
 abstract class NavigatorViewModel : ViewModel() {

@@ -3,8 +3,8 @@ package uk.henrytwist.androidbasics.livedata
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import uk.henrytwist.androidbasics.Event
-import uk.henrytwist.androidbasics.Trigger
+import uk.henrytwist.kotlinbasics.Event
+import uk.henrytwist.kotlinbasics.Trigger
 
 inline fun <T> LiveData<out Event<T>>.observeEvent(
         owner: LifecycleOwner,

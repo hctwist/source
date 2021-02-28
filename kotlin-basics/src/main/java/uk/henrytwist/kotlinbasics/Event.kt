@@ -1,4 +1,4 @@
-package uk.henrytwist.androidbasics
+package uk.henrytwist.kotlinbasics
 
 open class Event<T>(private val content: T) {
 

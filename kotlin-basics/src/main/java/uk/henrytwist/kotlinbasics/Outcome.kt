@@ -1,4 +1,4 @@
-package uk.henrytwist.androidbasics
+package uk.henrytwist.kotlinbasics
 
 sealed class Outcome<out T> {
 
