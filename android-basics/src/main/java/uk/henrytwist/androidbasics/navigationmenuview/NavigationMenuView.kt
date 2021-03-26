@@ -1,7 +1,11 @@
 package uk.henrytwist.androidbasics.navigationmenuview
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -10,21 +14,39 @@ import android.widget.CheckedTextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.getColorStateListOrThrow
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 import uk.henrytwist.androidbasics.R
+import uk.henrytwist.androidbasics.getColorAttr
 
-// TODO Finish
+// TODO Support item margins that don't include item background?
 class NavigationMenuView(context: Context, attributeSet: AttributeSet) : RecyclerView(context, attributeSet) {
 
-    private val menuAdapter = Adapter()
+    private val menuAdapter: Adapter
 
     init {
 
-        val itemBackgroundDrawable = MaterialShapeDrawable(context, attributeSet, 0, R.style.NavigationMenuView)
-        itemBackgroundDrawable.tintList = ContextCompat.getColorStateList(context, R.color.navigation_menu_view_item_background)
-        menuAdapter.itemBackgroundDrawable = itemBackgroundDrawable
+        val styledAttributes = context.obtainStyledAttributes(attributeSet, R.styleable.NavigationMenuView, 0, 0)
+
+        val horizontalPadding = styledAttributes.getDimension(R.styleable.NavigationMenuView_navigationItemHorizontalPadding, 0F)
+        val itemPadding = resources.getDimension(R.dimen.navigation_item_horizontal_padding)
+        val padding = (horizontalPadding - itemPadding).toInt().coerceAtLeast(0)
+
+        setPadding(padding, paddingTop, padding, paddingBottom)
+
+        val itemBackgroundColor = styledAttributes.getColorStateListOrThrow(R.styleable.NavigationMenuView_navigationItemBackgroundColor)
+        val itemForegroundColor = styledAttributes.getColorStateListOrThrow(R.styleable.NavigationMenuView_navigationItemForegroundColor)
+
+        styledAttributes.recycle()
+
+        val shapeAppearanceModel = ShapeAppearanceModel.builder(context, attributeSet, 0, R.style.NavigationMenuView).build()
+
+        val rippleColor = ColorStateList.valueOf(context.getColorAttr(R.attr.colorControlHighlight))
+        menuAdapter = Adapter(shapeAppearanceModel, itemBackgroundColor, itemForegroundColor, rippleColor)
 
         layoutManager = LinearLayoutManager(context)
         adapter = menuAdapter
@@ -48,16 +70,16 @@ class NavigationMenuView(context: Context, attributeSet: AttributeSet) : Recycle
 
         val items = mutableListOf<MenuItem>()
 
-        fun addItem(@StringRes nameRes: Int, @DrawableRes iconRes: Int?, onItemClicked: () -> Unit) {
+        fun addItem(@StringRes nameRes: Int, @DrawableRes iconRes: Int?, checked: Boolean, onItemClicked: () -> Unit) {
 
             val name = context.getString(nameRes)
             val icon = iconRes?.let { ContextCompat.getDrawable(context, it) }
-            addItem(name, icon, onItemClicked)
+            addItem(name, icon, checked, onItemClicked)
         }
 
-        fun addItem(name: String, icon: Drawable?, onItemClicked: () -> Unit) {
+        fun addItem(name: String, icon: Drawable?, checked: Boolean, onItemClicked: () -> Unit) {
 
-            items.add(MenuItem.Item(name, icon, false, onItemClicked))
+            items.add(MenuItem.Item(name, icon, checked, onItemClicked))
         }
 
         fun addItem(item: MenuItem.Item) {
@@ -84,9 +106,13 @@ class NavigationMenuView(context: Context, attributeSet: AttributeSet) : Recycle
         }
     }
 
-    internal class Adapter : RecyclerView.Adapter<ViewHolder>() {
+    internal class Adapter(
+            private val shapeAppearanceModel: ShapeAppearanceModel,
+            private val itemBackgroundColor: ColorStateList,
+            private val itemForegroundColor: ColorStateList,
+            private val rippleColor: ColorStateList
+    ) : RecyclerView.Adapter<ViewHolder>() {
 
-        var itemBackgroundDrawable: MaterialShapeDrawable? = null
         var items = listOf<MenuItem>()
 
         override fun getItemCount(): Int {
@@ -104,7 +130,7 @@ class NavigationMenuView(context: Context, attributeSet: AttributeSet) : Recycle
             val inflater = LayoutInflater.from(parent.context)
             return when (viewType) {
 
-                MenuItem.VIEW_TYPE_ITEM -> ItemHolder(inflater.inflate(R.layout.navigation_menu_view_item, parent, false), itemBackgroundDrawable)
+                MenuItem.VIEW_TYPE_ITEM -> ItemHolder(inflater.inflate(R.layout.navigation_menu_view_item, parent, false), shapeAppearanceModel, itemBackgroundColor, itemForegroundColor, rippleColor)
                 MenuItem.VIEW_TYPE_DIVIDER -> DividerHolder(inflater.inflate(R.layout.navigation_menu_view_divider, parent, false))
                 else -> throw IllegalArgumentException("Invalid view type")
             }
@@ -121,27 +147,39 @@ class NavigationMenuView(context: Context, attributeSet: AttributeSet) : Recycle
             }
         }
 
-        class ItemHolder(itemView: View, backgroundDrawable: MaterialShapeDrawable?) : ViewHolder(itemView) {
+        class ItemHolder(
+                itemView: View,
+                shapeAppearanceModel: ShapeAppearanceModel,
+                itemBackgroundColor: ColorStateList,
+                itemForegroundColor: ColorStateList,
+                rippleColor: ColorStateList
+        ) : ViewHolder(itemView) {
 
             private val textView = itemView as CheckedTextView
 
             init {
 
-                textView.background = backgroundDrawable?.mutate()
+                val itemMaterialShape = MaterialShapeDrawable(shapeAppearanceModel)
+                itemMaterialShape.tintList = itemBackgroundColor
+
+                val mask = MaterialShapeDrawable(shapeAppearanceModel)
+
+                val ripple = RippleDrawable(rippleColor, itemMaterialShape, mask)
+
+                textView.background = ripple
+                textView.setTextColor(itemForegroundColor)
+                TextViewCompat.setCompoundDrawableTintList(textView, itemForegroundColor)
             }
 
             fun bind(item: MenuItem.Item) {
 
-                textView.isChecked = true
-
+                textView.isChecked = item.checked
                 textView.setOnClickListener { item.onItemClicked() }
 
-                item.icon?.let {
-
-                    val iconSize = textView.resources.getDimensionPixelSize(R.dimen.navigation_item_icon_size)
-                    it.setBounds(0, 0, iconSize, iconSize)
-                    textView.setCompoundDrawablesRelative(it, null, null, null)
-                }
+                val icon = item.icon ?: ColorDrawable(Color.TRANSPARENT)
+                val iconSize = textView.resources.getDimensionPixelSize(R.dimen.navigation_item_icon_size)
+                icon.setBounds(0, 0, iconSize, iconSize)
+                textView.setCompoundDrawablesRelative(icon, null, null, null)
 
                 textView.text = item.name
             }

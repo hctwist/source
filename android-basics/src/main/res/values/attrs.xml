@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="NavigationMenuView">
+
+        <attr name="navigationItemBackgroundColor" format="color" />
+        <attr name="navigationItemForegroundColor" format="color" />
+
+        <attr name="navigationItemHorizontalPadding" format="dimension" />
+    </declare-styleable>
+</resources>

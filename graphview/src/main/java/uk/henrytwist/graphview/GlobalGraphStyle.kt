@@ -2,6 +2,7 @@ package uk.henrytwist.graphview
 
 import android.content.res.TypedArray
 import android.graphics.Color
+import com.twisthenry8gmail.graphview.R
 
 class GlobalGraphStyle(attributesArray: TypedArray) {
 

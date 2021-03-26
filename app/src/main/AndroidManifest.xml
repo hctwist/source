@@ -2,6 +2,7 @@
     package="com.twisthenry8gmail.projectsource">
 
     <application
+        android:name="uk.henrytwist.projectsource.HiltApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

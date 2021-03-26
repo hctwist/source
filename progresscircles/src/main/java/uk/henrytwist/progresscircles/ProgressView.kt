@@ -9,6 +9,7 @@ import android.view.View
 import android.view.animation.Interpolator
 import android.view.animation.PathInterpolator
 import androidx.core.animation.doOnEnd
+import com.twisthenry8gmail.progresscircles.R
 import kotlin.math.abs
 import kotlin.math.roundToLong
 

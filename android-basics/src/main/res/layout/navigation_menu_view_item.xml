@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.AppCompatCheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/navigation_menu_view_text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:drawablePadding="32dp"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/navigation_item_min_height"
+    android:paddingHorizontal="@dimen/navigation_item_horizontal_padding"
+    android:paddingVertical="@dimen/navigation_item_vertical_padding"
+    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />

@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import com.twisthenry8gmail.graphview.R
 
 class GraphView(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
 

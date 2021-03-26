@@ -93,19 +93,16 @@ class SelectSliderView(context: Context, attributeSet: AttributeSet) : RecyclerV
 
             val holder = getChildViewHolder(it)
 
-            // TODO RTl support
-            val itemViewLeft = lm.getDecoratedLeft(holder.itemView) - startPadding
-            val itemViewRight = lm.getDecoratedRight(holder.itemView) - startPadding
+            val itemViewStart = lm.getDecoratedStart(holder.itemView) - startPadding
+            val itemViewWidth = holder.itemView.width
 
-            val itemViewWidth = itemViewRight - itemViewLeft
+            // Start edge is to the end of the snap position
+            val selectedFraction = 1F - if (itemViewStart > 0) {
 
-            // Left edge is to the right of the snap position
-            val selectedFraction = 1F - if (itemViewLeft > 0) {
-
-                itemViewLeft.toFloat() / lastItemViewWidth
+                itemViewStart.toFloat() / lastItemViewWidth
             } else {
 
-                -itemViewLeft.toFloat() / itemViewWidth
+                -itemViewStart.toFloat() / itemViewWidth
             }.coerceIn(0F, 1F)
 
             a.onAnimateViewHolder(holder, selectedFraction)

@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.twisthenry8gmail.skeletonlayout.R
+import com.henrytwist.skeletonlayout.R
 
 class SkeletonLayout(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
